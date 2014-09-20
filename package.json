@@ -1,0 +1,17 @@
+{
+    "name": "conkitty-app",
+    "version": "0.0.1",
+    "description": "Conkitty application helpers",
+    "main": "capp.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/hoho/conkitty-app.git"
+    },
+    "author": "Marat Abdullin <dakota@brokenpipe.ru>",
+    "license": "MIT",
+    "devDependencies": {
+        "gulp": "~3.8.8",
+        "gulp-eslint": "~0.1.8",
+        "assert-version": "~0.0.3"
+    }
+}
