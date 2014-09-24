@@ -1,13 +1,17 @@
+/*!
+ * conkitty-app v0.0.1, https://github.com/hoho/conkitty-app
+ * (c) 2014 Yandex LLC, MIT license
+ */
 var $CA = (function() {
     var ready = [],
         themeNodes = {},
         curTheme,
         documentLoaded,
         themeLoaded,
+        cb,
         $CA = function() {
             documentLoaded = true;
             if (themeLoaded) {
-                var cb;
                 while ((cb = ready.shift())) {
                     cb();
                 }
