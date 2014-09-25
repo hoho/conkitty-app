@@ -16,7 +16,11 @@ var $CA = (function() {
             readyCallback();
         };
 
-    $CA.ready = function(callback) { ready.push(callback); };
+    $CA.ready = function(callback) {
+        ready.push(callback);
+        readyCallback();
+    };
+
     $CA.themes = function(themes) {
         var t,
             prev;
@@ -32,6 +36,7 @@ var $CA = (function() {
         themeRing[prev] = defaultTheme;
         $CA.theme();
     };
+
     $CA.theme = function(theme) {
         var cookieTheme = document.cookie.replace(/^(?:.*\$CAtheme=([^;]+).*|.*)$/, '$1'),
             nodes,
