@@ -10,11 +10,12 @@ var $CA = (function() {
         documentLoaded,
         themeFilesInProgress = 0,
         $CAthemes,
-        themeRing,
-        $CA = function() {
-            documentLoaded = true;
-            readyCallback();
-        };
+        themeRing;
+
+    function $CA() {
+        documentLoaded = true;
+        readyCallback();
+    }
 
     $CA.ready = function(callback) {
         ready.push(callback);
