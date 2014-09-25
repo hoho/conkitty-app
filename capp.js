@@ -6,44 +6,80 @@ var $CA = (function() {
     var ready = [],
         themeNodes = {},
         curTheme,
+        defaultTheme,
         documentLoaded,
-        themeLoaded,
-        cb,
+        themeFilesInProgress = 0,
+        $CAthemes,
+        themeRing,
         $CA = function() {
             documentLoaded = true;
-            if (themeLoaded) {
-                while ((cb = ready.shift())) {
-                    cb();
-                }
-            }
+            readyCallback();
         };
 
     $CA.ready = function(callback) { ready.push(callback); };
+    $CA.themes = function(themes) {
+        var t,
+            prev;
+
+        $CAthemes = themes;
+        themeRing = {};
+
+        for (t in themes) {
+            if (!defaultTheme) { defaultTheme = t; }
+            if (prev) { themeRing[prev] = t; }
+            prev = t;
+        }
+        themeRing[prev] = defaultTheme;
+        $CA.theme();
+    };
     $CA.theme = function(theme) {
-        var node = themeNodes[theme];
+        var cookieTheme = document.cookie.replace(/^(?:.*\$CAtheme=([^;]+).*|.*)$/, '$1'),
+            nodes,
+            files,
+            i,
+            node;
+
+        if (!theme) { theme = curTheme === undefined ? cookieTheme || defaultTheme : themeRing[curTheme]; }
+        if (cookieTheme || theme !== defaultTheme) { document.cookie = ('$CAtheme=' + theme); }
+
+        nodes = themeNodes[theme];
         curTheme = theme;
-        if (node) {
-            node.onload();
+
+        if (nodes) {
+            readyCallback();
         } else {
-            node = themeNodes[theme] = document.createElement('link');
-            node.rel = 'stylesheet';
-            node.href = $CA_styles[theme];
-            node.onload = node.onerror = function(/**/t, e) {
-                for (t in themeNodes) {
-                    if ((e = themeNodes[t])) { e.disabled = t !== curTheme; }
-                }
-                if (!themeLoaded) {
-                    themeLoaded = true;
-                    if (documentLoaded) { $CA(); }
-                }
-            };
-            document.head.appendChild(node);
+            nodes = themeNodes[theme] = [];
+            files = $CAthemes[theme];
+            themeFilesInProgress += files.length;
+            for (i = 0; i < files.length; i++) {
+                node = document.createElement('link');
+                node.rel = 'stylesheet';
+                node.href = files[i];
+                node.onload = node.onerror = function() {
+                    themeFilesInProgress--;
+                    readyCallback();
+                };
+                document.head.appendChild(node);
+                nodes.push(node);
+            }
         }
     };
 
-    if (typeof $CA_styles !== 'undefined') {
-        $CA.theme('light');
-    }
-
     return $CA;
+
+
+    function readyCallback(/**/cb, theme, nodes, i) {
+        if (documentLoaded && themeFilesInProgress === 0) {
+            while ((cb = ready.shift())) {
+                cb();
+            }
+
+            for (theme in themeNodes) {
+                nodes = themeNodes[theme];
+                for (i = nodes.length; i--;) {
+                    nodes[i].disabled = theme !== curTheme;
+                }
+            }
+        }
+    }
 })();
