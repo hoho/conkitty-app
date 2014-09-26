@@ -17,6 +17,7 @@ var $CA = (function() {
         readyCallback();
     }
 
+
     $CA.ready = function(callback) {
         ready.push(callback);
         readyCallback();
@@ -38,8 +39,13 @@ var $CA = (function() {
         $CA.theme();
     };
 
+    document.addEventListener('visibilitychange', function() {
+        var t = getThemeByCookie();
+        if (t && curTheme !== t) { $CA.theme(t); }
+    }, false);
+
     $CA.theme = function(theme) {
-        var cookieTheme = document.cookie.replace(/^(?:.*\$CAtheme=([^;]+).*|.*)$/, '$1'),
+        var cookieTheme = getThemeByCookie(),
             nodes,
             files,
             i,
@@ -87,5 +93,9 @@ var $CA = (function() {
                 }
             }
         }
+    }
+
+    function getThemeByCookie() {
+        return document.cookie.replace(/^(?:.*\$CAtheme=([^;]+).*|.*)$/, '$1');
     }
 })();
